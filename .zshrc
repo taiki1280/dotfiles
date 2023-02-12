@@ -1,6 +1,3 @@
-setopt auto_cd
-function chpwd() { ls -alF }
-
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
@@ -143,3 +140,7 @@ if test $(service docker status | awk '{print $4}') = 'not'; then
     # docker を起動
     sudo /usr/sbin/service docker start
 fi
+
+function _ssh {
+  compadd `fgrep 'Host ' ~/.ssh/config | awk '{print $2}' | sort`;
+}
