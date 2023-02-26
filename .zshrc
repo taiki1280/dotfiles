@@ -8,7 +8,7 @@ export ZSH="$HOME/.oh-my-zsh"
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="agnoster"
+ZSH_THEME='agnoster'
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -102,18 +102,20 @@ source $ZSH/oh-my-zsh.sh
 
 # auto change directory
 setopt auto_cd
-function chpwd() { ls -alF --color=auto }
+function chpwd() {
+  clear
+  ls -alF --color=auto
+}
 
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    alias ls='ls --color=auto'
-    #alias dir='dir --color=auto'
-    #alias vdir='vdir --color=auto'
-
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
+  test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+  alias ls='ls --color=auto'
+  #alias dir='dir --color=auto'
+  #alias vdir='vdir --color=auto'
+  alias grep='grep --color=auto'
+  alias fgrep='fgrep --color=auto'
+  alias egrep='egrep --color=auto'
 fi
 
 # some more ls aliases
@@ -133,14 +135,15 @@ alias dcl='docker compose logs'
 alias dcd='docker compose down'
 alias dcbnc='docker compose build --no-cache'
 
-# 起動状態を表示
-echo $(service docker status | awk '{print $4}')
-if test $(service docker status | awk '{print $4}') = 'not'; then
-    # 停止状態である場合
-    # docker を起動
-    sudo /usr/sbin/service docker start
+# Docker daemon
+if [[ "$(uname -r)" == *microsoft* ]] && test $(service docker status | awk '{print $4}') = 'not'; then
+  echo 'WSL上でDockerを起動しました'
+  sudo /usr/sbin/service docker start
+elif test $(systemctl is-active docker) = 'inactive'; then
+  echo 'WSL以外の通常OSでDockerを起動しました'
+  sudo /usr/sbin/service docker start
 fi
 
 function _ssh {
-  compadd `fgrep 'Host ' ~/.ssh/config | awk '{print $2}' | sort`;
+  compadd $(fgrep 'Host ' ~/.ssh/config | awk '{print $2}' | sort)
 }
