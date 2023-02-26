@@ -136,14 +136,24 @@ alias dcd='docker compose down'
 alias dcbnc='docker compose build --no-cache'
 
 # Docker daemon
-if [[ "$(uname -r)" == *microsoft* ]] && test $(service docker status | awk '{print $4}') = 'not'; then
-  echo 'WSL上でDockerを起動しました'
-  sudo /usr/sbin/service docker start
-elif test $(systemctl is-active docker) = 'inactive'; then
-  echo 'WSL以外の通常OSでDockerを起動しました'
+if test $(systemctl is-active docker) = 'inactive'; then
+  echo 'Dockerが起動していなかったため、起動しておきました。'
   sudo /usr/sbin/service docker start
 fi
 
 function _ssh {
-  compadd $(fgrep 'Host ' ~/.ssh/config | awk '{print $2}' | sort)
+  compadd $(grep '^Host ' ~/.ssh/conf.d/hosts/* | awk '{print $2}' | sort)
 }
+
+# z コマンド
+. ~/z/z.sh
+
+# peco
+function peco-history-selection() {
+  BUFFER=$(history -n 1 | tac | awk '!a[$0]++' | peco)
+  CURSOR=$#BUFFER
+  zle reset-prompt
+}
+
+zle -N peco-history-selection
+bindkey '^R' peco-history-selection
