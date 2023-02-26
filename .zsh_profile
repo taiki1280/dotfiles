@@ -1,0 +1,20 @@
+# 表を赤に
+COLOR_FG='%F{white}'
+# 背景を緑に
+COLOR_BG='%K{red}'
+# 色を元に戻す
+COLOR_END='%f%k'
+PROMPT="${COLOR_FG}${COLOR_BG} sample ${COLOR_END}%{%f%b%k%}$(build_prompt) "
+
+colorlist() {
+  for color in {000..015}; do
+    print -nP "%F{$color}$color %f"
+  done
+  printf "\n"
+  for color in {016..255}; do
+    print -nP "%F{$color}$color %f"
+    if [ $(($((color - 16)) % 6)) -eq 5 ]; then
+      printf "\n"
+    fi
+  done
+}
