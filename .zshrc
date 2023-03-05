@@ -107,6 +107,10 @@ function chpwd() {
   ls -alF --color=auto
 }
 
+function _ssh {
+  compadd $(grep '^Host ' ~/.ssh/conf.d/hosts/* | awk '{print $2}' | sort)
+}
+
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
   test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
@@ -141,12 +145,20 @@ if test $(systemctl is-active docker) = 'inactive'; then
   sudo /usr/sbin/service docker start
 fi
 
-function _ssh {
-  compadd $(grep '^Host ' ~/.ssh/conf.d/hosts/* | awk '{print $2}' | sort)
-}
-
 # z コマンド
-. ~/z/z.sh
+if [ -e ~/z/z.sh ]; then
+  . ~/z/z.sh
+else
+  # 存在しない場合
+  echo '「~/z/z.sh」は存在しませんでした。'
+fi
+
+if [ -e ~/.zsh_profile ]; then
+  source ~/.zsh_profile
+else
+  # 存在しない場合
+  echo '「~/.zsh_profile」は存在しませんでした'
+fi
 
 # peco
 function peco-history-selection() {
@@ -157,5 +169,3 @@ function peco-history-selection() {
 
 zle -N peco-history-selection
 bindkey '^R' peco-history-selection
-
-source ~/.zsh_profile
