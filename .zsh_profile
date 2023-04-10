@@ -1,10 +1,26 @@
-# 表を赤に
-COLOR_FG='%F{white}'
-# 背景を緑に
-COLOR_BG='%K{red}'
-# 色を元に戻す
-COLOR_END='%f%k'
-PROMPT="${COLOR_FG}${COLOR_BG} sample ${COLOR_END}%{%f%b%k%}$(build_prompt) "
+# 文字
+DISPLAY_TEXT=${HOST}
+# 文字色
+COLOR_FG='white'
+# 背景色
+COLOR_BG='130'
+
+## Main prompt (Over ride)
+build_prompt() {
+  RETVAL=$?
+  prompt_status
+  prompt_virtualenv
+  prompt_segment ${COLOR_BG} ${COLOR_FG} ${DISPLAY_TEXT}
+  prompt_aws
+  # prompt_context
+  prompt_dir
+  prompt_git
+  prompt_bzr
+  prompt_hg
+  prompt_end
+}
+
+PROMPT='%{%f%b%k%}$(build_prompt) '
 
 colorlist() {
   for color in {000..015}; do
