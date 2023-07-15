@@ -108,7 +108,7 @@ function chpwd() {
 }
 
 function _ssh {
-  compadd $(grep '^Host ' ~/.ssh/conf.d/hosts/* | awk '{print $2}' | sort)
+  compadd $(grep '^Host ' ~/.ssh/conf.d/*/config | grep -v '*' | awk '{print $2}' | sort)
 }
 
 # enable color support of ls and also add handy aliases
