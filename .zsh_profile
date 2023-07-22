@@ -3,7 +3,23 @@ DISPLAY_TEXT=${HOST}
 # 文字色
 COLOR_FG='white'
 # 背景色
-COLOR_BG='130'
+case $HOST in
+taiki-main)
+  COLOR_BG='027'
+  ;;
+taiki-lifebook)
+  COLOR_BG='white'
+  ;;
+dev)
+  COLOR_BG='130'
+  ;;
+web)
+  COLOR_BG='red'
+  ;;
+*)
+  COLOR_BG='black'
+  ;;
+esac
 
 ## Main prompt (Over ride)
 build_prompt() {
