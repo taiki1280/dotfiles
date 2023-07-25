@@ -139,6 +139,10 @@ alias dcl='docker compose logs'
 alias dcd='docker compose down'
 alias dcbnc='docker compose build --no-cache'
 
+# クリップボード
+alias pbcopy='clip.exe'
+alias pbpaste='powershell.exe -Command Get-Clipboard'
+
 # Docker daemon
 if test $(systemctl is-active docker) = 'inactive'; then
   echo 'Dockerが起動していなかったため、起動しておきました。'
