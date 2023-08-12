@@ -13,7 +13,7 @@ for file in ${DOT_FILES[@]}; do
     cp $HOME/$file $BACKUP_DIR$file
     echo "created right one 「${BACKUP_DIR}$file」"
   fi
-  ln -svf $HOME/git/taiki/dotfiles/$file $HOME/
+  ln -svf $PWD/$file $HOME/
   echo 'created symbolic link'
   if [ $file = '.zshrc' ]; then
     # 「zsh」は「.vimrc」に非対応。また、「.vimrc」は起動する度に読み込むらしいので不要
