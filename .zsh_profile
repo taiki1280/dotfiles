@@ -61,4 +61,6 @@ if [ -z "$SSH_AUTH_SOCK" ]; then
   eval $(cat $HOME/.ssh/ssh-agent)
 fi
 
-ssh-add $HOME/.ssh/conf.d/01_taiki/id_ed25519
+if [ -e $HOME/.ssh/conf.d/01_taiki/id_ed25519 ]; then
+  ssh-add $HOME/.ssh/conf.d/01_taiki/id_ed25519
+fi
