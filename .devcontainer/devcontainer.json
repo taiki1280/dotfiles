@@ -6,6 +6,7 @@
     "image": "mcr.microsoft.com/devcontainers/base:jammy",
     // Features to add to the dev container. More info: https://containers.dev/features.
     // "features": {},
+    "workspaceFolder": "/home/vscode/dotfiles",
     // Use 'forwardPorts' to make a list of ports inside the container available locally.
     // "forwardPorts": [],
     // Use 'postCreateCommand' to run commands after the container is created.
@@ -13,9 +14,19 @@
     // Configure tool-specific properties.
     "customizations": {
         "vscode": {
+            "extensions": [
+                "foxundermoon.shell-format",
+                "esbenp.prettier-vscode",
+                "mhutchie.git-graph"
+            ],
             "settings": {
                 "dotfiles.repository": "https://github.com/taiki1280/dotfiles.git",
-                "dotfiles.installCommand": "~/dotfiles/setup.sh"
+                "dotfiles.installCommand": "~/dotfiles/setup.sh",
+                "workbench.colorCustomizations": {
+                    "titleBar.inactiveBackground": "#123C63",
+                    "titleBar.activeBackground": "#123C63",
+                    "statusBar.background": "#123C63"
+                }
             }
         }
     },

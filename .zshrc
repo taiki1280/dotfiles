@@ -144,24 +144,22 @@ alias pbcopy='clip.exe'
 alias pbpaste='powershell.exe -Command Get-Clipboard'
 
 # Docker daemon
-if test $(systemctl is-active docker) = 'inactive'; then
-  echo 'Dockerが起動していなかったため、起動しておきました。'
+if test "$(pgrep -o systemctl)" = "1" && test $(systemctl is-active docker) = 'inactive'; then
   sudo /usr/sbin/service docker start
+  echo 'Dockerが起動していなかったため、起動しておきました。'
 fi
 
 # z コマンド
-if [ -e ~/z/z.sh ]; then
-  . ~/z/z.sh
+if [ -e $HOME/z/z.sh ]; then
+  source $HOME/z/z.sh
 else
-  # 存在しない場合
-  echo '「~/z/z.sh」は存在しませんでした。'
+  echo "「$HOME/z/z.sh」は存在しませんでした。"
 fi
 
-if [ -e ~/.zsh_profile ]; then
-  source ~/.zsh_profile
+if [ -e $HOME/.zsh_profile ]; then
+  source $HOME/.zsh_profile
 else
-  # 存在しない場合
-  echo '「~/.zsh_profile」は存在しませんでした'
+  echo "「$HOME/.zsh_profile」は存在しませんでした"
 fi
 
 # peco
