@@ -6,11 +6,13 @@
     "image": "mcr.microsoft.com/devcontainers/base:jammy",
     // Features to add to the dev container. More info: https://containers.dev/features.
     // "features": {},
-    "workspaceFolder": "/home/vscode/dotfiles",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/git/dotfiles,type=bind,consistency=cached",
+    "workspaceFolder": "/home/vscode/git/dotfiles",
     // Use 'forwardPorts' to make a list of ports inside the container available locally.
     // "forwardPorts": [],
     // Use 'postCreateCommand' to run commands after the container is created.
-    // "postCreateCommand": "uname -a",
+    // 本プロジェクトは dotfiles なので、作成時にコマンド実行を行う
+    "postCreateCommand": "zsh /home/vscode/git/dotfiles/setup.sh",
     // Configure tool-specific properties.
     "customizations": {
         "vscode": {
@@ -20,8 +22,11 @@
                 "mhutchie.git-graph"
             ],
             "settings": {
-                "dotfiles.repository": "https://github.com/taiki1280/dotfiles.git",
-                "dotfiles.installCommand": "~/dotfiles/setup.sh",
+                // 別のプロジェクトで dotfiles を使用する際は postCreateCommand は不要。
+                // 以下の様にリポジトリーから取得して dotfiles を使用
+                // "dotfiles.repository": "https://github.com/taiki1280/dotfiles.git",
+                // "dotfiles.targetPath": "~/git/dotfiles/",
+                // "dotfiles.installCommand": "setup.sh",
                 "workbench.colorCustomizations": {
                     "titleBar.inactiveBackground": "#123C63",
                     "titleBar.activeBackground": "#123C63",
