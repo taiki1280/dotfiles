@@ -163,6 +163,13 @@ else
   echo "「$HOME/.zsh_profile」は存在しませんでした"
 fi
 
+# ポートフォワード
+if [ -e $HOME/.ssh/port_forward.sh ]; then
+  nohup bash $HOME/.ssh/port_forward.sh >/dev/null 2>&1 &
+else
+  echo "「$HOME/.ssh/port_forward.sh」は存在しませんでした"
+fi
+
 # peco
 function peco-history-selection() {
   BUFFER=$(history -n 1 | tac | awk '!a[$0]++' | peco)
