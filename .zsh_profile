@@ -1,28 +1,28 @@
-# 文字
-DISPLAY_TEXT=${HOST}
-# 文字色
-COLOR_FG='white'
-# 背景色
-case $HOST in
-taiki-main)
-  COLOR_BG='027'
-  ;;
-taiki-lifebook)
-  COLOR_BG='white'
-  ;;
-dev)
-  COLOR_BG='130'
-  ;;
-web)
-  COLOR_BG='red'
-  ;;
-*)
-  COLOR_BG='black'
-  ;;
-esac
-
 # Overwrite prompt if you use agnoster theme
 if [ $ZSH_THEME = 'agnoster' ]; then
+  # 文字
+  DISPLAY_TEXT=${HOST}
+  # 文字色
+  COLOR_FG='white'
+  # 背景色
+  case $HOST in
+  taiki-main)
+    COLOR_BG='027'
+    ;;
+  taiki-lifebook)
+    COLOR_BG='white'
+    ;;
+  dev)
+    COLOR_BG='130'
+    ;;
+  web)
+    COLOR_BG='red'
+    ;;
+  *)
+    COLOR_BG='black'
+    ;;
+  esac
+
   build_prompt() {
     RETVAL=$?
     prompt_status
