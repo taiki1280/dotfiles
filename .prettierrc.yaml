@@ -13,3 +13,6 @@ overrides:
       trailingComma: none
       arrowParens: avoid
       proseWrap: never
+  - files: '*.yaml'
+    options:
+      tabWidth: 2
