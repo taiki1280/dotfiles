@@ -6,6 +6,9 @@ jsxSingleQuote: true
 printWidth: 120
 semi: false
 overrides:
+  - files: '*.json'
+    options:
+      printWidth: 70
   - files: '*.md'
     options:
       printWidth: 70
