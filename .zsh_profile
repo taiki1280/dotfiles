@@ -1,5 +1,5 @@
 # Overwrite prompt if you use agnoster theme
-if [ $ZSH_THEME = 'agnoster' ]; then
+if [ $RANDOM_THEME = 'agnoster' ]; then
   # 文字
   DISPLAY_TEXT=${HOST}
   # 文字色
@@ -12,10 +12,10 @@ if [ $ZSH_THEME = 'agnoster' ]; then
   taiki-lifebook)
     COLOR_BG='white'
     ;;
-  dev)
+  taiki-dev)
     COLOR_BG='130'
     ;;
-  web)
+  taiki-web)
     COLOR_BG='red'
     ;;
   *)
