@@ -53,16 +53,8 @@ colorlist() {
   done
 }
 
-if [ -z "$SSH_AUTH_SOCK" ]; then
-  # Check for a currently running instance of the agent
-  RUNNING_AGENT="$(ps -ax | grep 'ssh-agent -s' | grep -v grep | wc -l | tr -d '[:space:]')"
-  if [ "$RUNNING_AGENT" = "0" ]; then
-    # Launch a new instance of the agent
-    ssh-agent -s &>$HOME/.ssh/ssh-agent
-  fi
-  eval $(cat $HOME/.ssh/ssh-agent)
-fi
-
-if [ -e $HOME/.ssh/conf.d/01_taiki/id_ed25519 ]; then
-  ssh-add $HOME/.ssh/conf.d/01_taiki/id_ed25519
+# For Loading the SSH key
+if [ "${HOST:0:5}" = 'taiki' ]; then
+  /usr/bin/keychain -q --nogui $HOME/.ssh/conf.d/01_taiki/id_ed25519
+  source $HOME/.keychain/$(hostname)-sh
 fi
