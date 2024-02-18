@@ -70,7 +70,26 @@ ZSH_THEME_RANDOM_CANDIDATES=("jonathan" "agnoster")
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git)
+plugins=(
+  # oh-my-zsh 初期プラグイン（元々入っているもの）
+  ubuntu
+  docker
+  docker-compose
+  vscode
+  z
+  copypath
+  git
+  history
+  rsync
+  aws
+  npm
+  composer
+  python
+  cakephp3
+  # 外部プラグイン
+  zsh-autosuggestions
+  zsh-syntax-highlighting
+)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -130,18 +149,6 @@ fi
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
-
-# Dockerコマンド
-alias d='docker'
-alias dc='docker compose'
-alias docker-compose='docker compose'
-alias dcps='docker compose ps'
-alias dcud='docker compose up -d'
-alias dcudb='docker compose up -d --build'
-alias dce='docker compose exec'
-alias dcl='docker compose logs'
-alias dcd='docker compose down'
-alias dcbnc='docker compose build --no-cache'
 
 # クリップボード
 alias pbcopy='clip.exe'
