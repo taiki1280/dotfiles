@@ -109,7 +109,10 @@ function chpwd() {
 }
 
 function _ssh {
-  compadd $(grep '^Host ' ~/.ssh/conf.d/*/config | grep -v '*' | awk '{print $2}' | sort)
+  compadd $(grep '^Host ' ~/.ssh/conf.d/personal/*/config | grep -v '*' | awk '{print $2}' | sort)
+  if [ "${HOST:0:5}" != 'taiki' ]; then
+    compadd $(grep '^Host ' ~/.ssh/conf.d/work/*/config | grep -v '*' | awk '{print $2}' | sort)
+  fi
 }
 
 # enable color support of ls and also add handy aliases
@@ -164,10 +167,10 @@ else
 fi
 
 # ポートフォワード
-if [ -e $HOME/.ssh/port_forward.sh ]; then
-  nohup bash $HOME/.ssh/port_forward.sh >/dev/null 2>&1 &
+if [ -e $HOME/.ssh/conf.d/port_forward.sh ]; then
+  nohup bash $HOME/.ssh/conf.d/port_forward.sh >/dev/null 2>&1 &
 else
-  echo "「$HOME/.ssh/port_forward.sh」は存在しませんでした"
+  echo "「$HOME/.ssh/conf.d/port_forward.sh」は存在しませんでした"
 fi
 
 # peco

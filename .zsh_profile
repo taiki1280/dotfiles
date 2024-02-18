@@ -54,7 +54,5 @@ colorlist() {
 }
 
 # For Loading the SSH key
-if [ "${HOST:0:5}" = 'taiki' ]; then
-  /usr/bin/keychain -q --nogui $HOME/.ssh/conf.d/01_taiki/id_ed25519
-  source $HOME/.keychain/$(hostname)-sh
-fi
+/usr/bin/keychain -q --nogui $HOME/.ssh/conf.d/personal/taiki/id_ed25519
+source $HOME/.keychain/$(hostname)-sh
