@@ -160,13 +160,6 @@ if test "$(pgrep -o systemctl)" = "1" && test $(systemctl is-active docker) = 'i
   echo 'Dockerが起動していなかったため、起動しておきました。'
 fi
 
-# z コマンド
-if [ -e $HOME/z/z.sh ]; then
-  source $HOME/z/z.sh
-else
-  echo "「$HOME/z/z.sh」は存在しませんでした。"
-fi
-
 if [ -e $HOME/.zsh_profile ]; then
   source $HOME/.zsh_profile
 else
