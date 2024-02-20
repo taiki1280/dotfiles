@@ -54,5 +54,7 @@ colorlist() {
 }
 
 # For Loading the SSH key
-/usr/bin/keychain -q --nogui $HOME/.ssh/conf.d/personal/taiki/id_ed25519
+/usr/bin/keychain -q --nogui $HOME/.ssh/conf.d/*/*/id_ed25519
+/usr/bin/keychain -q --nogui $HOME/.ssh/conf.d/*/*/*.pem
+/usr/bin/keychain -q --nogui $HOME/.ssh/conf.d/*/*/*.cer
 source $HOME/.keychain/$(hostname)-sh
