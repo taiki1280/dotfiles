@@ -138,8 +138,8 @@ function _ssh {
 if [ -x /usr/bin/dircolors ]; then
   test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
   alias ls='ls --color=auto'
-  #alias dir='dir --color=auto'
-  #alias vdir='vdir --color=auto'
+  # alias dir='dir --color=auto'
+  # alias vdir='vdir --color=auto'
   alias grep='grep --color=auto'
   alias fgrep='fgrep --color=auto'
   alias egrep='egrep --color=auto'
@@ -164,6 +164,15 @@ if [ -e $HOME/.zsh_profile ]; then
   source $HOME/.zsh_profile
 else
   echo "「$HOME/.zsh_profile」は存在しませんでした"
+fi
+
+# devcontainer でないときのみ実行
+if [ "${REMOTE_CONTAINERS}" != "true" ]; then
+  # For Loading the SSH key
+  /usr/bin/keychain -q --nogui $HOME/.ssh/conf.d/*/*/id_ed25519
+  /usr/bin/keychain -q --nogui $HOME/.ssh/conf.d/*/*/*.pem
+  /usr/bin/keychain -q --nogui $HOME/.ssh/conf.d/*/*/*.cer
+  source $HOME/.keychain/$(hostname)-sh
 fi
 
 # ポートフォワード
