@@ -29,8 +29,24 @@ echo '【実行結果】'
 echo $message_result
 echo '-----------------------------------------------------------------------------------'
 
+echo 'oh-my-zsh が入っていない場合、インストール'
+if [ ! -d $HOME/.oh-my-zsh ]; then
+  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+fi
+echo '-----------------------------------------------------------------------------------'
+
+echo 'oh-my-zsh plugin が入っていない場合、インストール'
+# plugin
+PLUGIN_LIST=('zsh-autosuggestions' 'zsh-syntax-highlighting')
+for plugin in ${PLUGIN_LIST[@]}; do
+  if [ ! -d ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/$plugin ]; then
+    git clone https://github.com/zsh-users/$plugin ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/$plugin
+  fi
+done
+echo '-----------------------------------------------------------------------------------'
+
+echo '最後に .zshrc を読み込み'
 if [ -e $HOME/.zshrc ]; then
-  echo '最後に .zshrc を読み込みます'
   echo '-----------------------------------------------------------------------------------'
   source $HOME/.zshrc
 fi
