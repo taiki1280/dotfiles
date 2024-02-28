@@ -1,19 +1,15 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
 {
-    "name": "taiki_dotfiles_ubuntu",
+    "name": "Ubuntu",
     // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
     "image": "mcr.microsoft.com/devcontainers/base:jammy",
     // Features to add to the dev container. More info: https://containers.dev/features.
     // "features": {},
-    "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/git/dotfiles,type=bind,consistency=cached",
-    // ワークスペースはここにしているが、各種どっとファイルの設定を適用しているのは github のものなので修正しても git push するまで適用されない。とても注意。
-    "workspaceFolder": "/home/vscode/git/dotfiles",
     // Use 'forwardPorts' to make a list of ports inside the container available locally.
     // "forwardPorts": [],
     // Use 'postCreateCommand' to run commands after the container is created.
-    // 本プロジェクトは dotfiles なので裏で devcontainer 内で github からリポジトリをクローンせずとも、作成時にコマンド実行を行っても良い。
-    // "postCreateCommand": "zsh /home/vscode/git/dotfiles/install.sh",
+    // "postCreateCommand": "uname -a",
     // Configure tool-specific properties.
     "customizations": {
         "vscode": {
@@ -32,5 +28,5 @@
         }
     },
     // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-    "remoteUser": "vscode"
+    // "remoteUser": "root"
 }
