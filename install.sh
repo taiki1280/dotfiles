@@ -1,5 +1,5 @@
 #!/usr/bin/zsh
-DOT_FILES=($(ls -d $(ls -aF | grep -v "/" | grep -e "^\..\+$")))
+DOT_FILES=($(ls -d $(ls -aF | grep -v "/" | grep -v .gitignore | grep -e "^\..\+$")))
 echo '同階層にあるすべての dotfiles を処理します。'
 echo '\t''1. ホームディレクトリ直下に既に同じ名前のファイルがある場合、バックアップを作成して移動'
 echo '\t''2. ドットファイルの新保陸リンクを作成'
