@@ -190,7 +190,7 @@ fi
 
 # ポートフォワード
 if [ -e $HOME/.ssh/conf.d/port_forward.sh ]; then
-  nohup bash $HOME/.ssh/conf.d/port_forward.sh >/dev/null 2>&1 &
+  nohup bash $HOME/.ssh/conf.d/port_forward.sh >/dev/null 2>&1 &!
 else
   echo "「$HOME/.ssh/conf.d/port_forward.sh」は存在しませんでした"
 fi
