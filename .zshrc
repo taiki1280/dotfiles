@@ -25,7 +25,7 @@ ZSH_THEME='jonathan'
 
 # Uncomment one of the following lines to change the auto-update behavior
 # zstyle ':omz:update' mode disabled  # disable automatic updates
-# zstyle ':omz:update' mode auto      # update automatically without asking
+zstyle ':omz:update' mode auto # update automatically without asking
 # zstyle ':omz:update' mode reminder  # just remind me to update when it's time
 
 # Uncomment the following line to change how often to auto-update (in days).
@@ -60,7 +60,7 @@ ZSH_THEME='jonathan'
 # "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
 # or set a custom format using the strftime function format specifications,
 # see 'man strftime' for details.
-# HIST_STAMPS="mm/dd/yyyy"
+HIST_STAMPS="yyyy-mm-dd"
 
 # Would you like to use another custom folder than $ZSH/custom?
 # ZSH_CUSTOM=/path/to/new-custom-folder
@@ -120,12 +120,20 @@ export EDITOR='code --wait "$@"'
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+# ヒストリー機能
+HISTFILE=~/.zsh_history     # ヒストリファイルを指定
+HISTSIZE=10000              # ヒストリに保存するコマンド数
+SAVEHIST=10000              # ヒストリファイルに保存するコマンド数
+setopt hist_ignore_all_dups # 重複するコマンド行は古い方を削除
+setopt hist_ignore_dups     # 直前と同じコマンドラインはヒストリに追加しない
+setopt share_history        # コマンド履歴ファイルを共有する
+setopt append_history       # 履歴を追加 (毎回 .zsh_history を作るのではなく)
+setopt inc_append_history   # 履歴をインクリメンタルに追加
+setopt hist_no_store        # historyコマンドは履歴に登録しない
+setopt hist_reduce_blanks   # 余分な空白は詰めて記録
+
 # auto change directory
 setopt auto_cd
-function chpwd() {
-  clear
-  ls -alF --color=auto
-}
 
 function _ssh {
   compadd $(grep '^Host ' ~/.ssh/conf.d/personal/*/config | grep -v '*' | awk '{print $2}' | sort)
@@ -159,9 +167,34 @@ colorlist() {
 }
 
 # some more ls aliases
-alias ll='ls -alF'
-alias la='ls -A'
-alias l='ls -CF'
+# exa インストール済の場合、 ls 系のコマンドを exa へ置換
+if [[ $(command -v exa) ]]; then
+  # alias e='exa --icons'
+  alias e='exa'
+  alias l=e
+  alias ls=e
+  # alias ea='exa -a --icons'
+  alias ea='exa -a'
+  alias la=ea
+  # alias ee='exa -aal --icons'
+  alias ee='exa -aal'
+  alias ll=ee
+  # alias et='exa -T -L 3 -a -I "node_modules|.git|.cache" --icons'
+  alias et='exa -T -L 3 -a -I "node_modules|.git|.cache"'
+  alias lt=et
+  # alias eta='exa -T -a -I "node_modules|.git|.cache" --color=always --icons | less -r'
+  alias eta='exa -T -a -I "node_modules|.git|.cache" --color=always | less -r'
+  alias lta=eta
+else
+  alias ll='ls -laFh'
+  alias la='ls -A'
+  alias l='ls -CF'
+fi
+
+function chpwd() {
+  clear
+  ll
+}
 
 # クリップボード
 alias pbcopy='clip.exe'
