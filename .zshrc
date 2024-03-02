@@ -219,14 +219,15 @@ if [ "${REMOTE_CONTAINERS}" != "true" ]; then
   /usr/bin/keychain -q --nogui $HOME/.ssh/conf.d/*/*/*.pem
   /usr/bin/keychain -q --nogui $HOME/.ssh/conf.d/*/*/*.cer
   source $HOME/.keychain/$(hostname)-sh
+
+  # ポートフォワード
+  if [ -e $HOME/.ssh/conf.d/port_forward.sh ]; then
+    nohup bash $HOME/.ssh/conf.d/port_forward.sh >/dev/null 2>&1 &!
+  else
+    echo "「$HOME/.ssh/conf.d/port_forward.sh」は存在しませんでした"
+  fi
 fi
 
-# ポートフォワード
-if [ -e $HOME/.ssh/conf.d/port_forward.sh ]; then
-  nohup bash $HOME/.ssh/conf.d/port_forward.sh >/dev/null 2>&1 &!
-else
-  echo "「$HOME/.ssh/conf.d/port_forward.sh」は存在しませんでした"
-fi
 
 # peco
 function peco-history-selection() {
