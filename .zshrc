@@ -138,7 +138,7 @@ setopt auto_cd
 function _ssh {
   compadd $(grep '^Host ' ~/.ssh/conf.d/personal/*/config | grep -v '*' | awk '{print $2}' | sort)
   if [ "${HOST:0:5}" != 'taiki' ]; then
-    compadd $(grep '^Host ' ~/.ssh/conf.d/work/*/config | grep -v '*' | awk '{print $2}' | sort)
+    compadd $(grep '^Host ' ~/.ssh/conf.d/work/*/config | grep -v '*' | grep -v 'db' | awk '{print $2}' | sort)
   fi
 }
 
