@@ -215,19 +215,25 @@ fi
 # devcontainer でないときのみ実行
 if [ "${REMOTE_CONTAINERS}" != "true" ]; then
   # For Loading the SSH key
-  /usr/bin/keychain -q --nogui $HOME/.ssh/conf.d/*/*/id_ed25519
-  /usr/bin/keychain -q --nogui $HOME/.ssh/conf.d/*/*/*.pem
-  /usr/bin/keychain -q --nogui $HOME/.ssh/conf.d/*/*/*.cer
+  if find "$HOME/.ssh/conf.d/" -name "id_ed25519" -print -quit; then
+    /usr/bin/keychain -q --nogui $HOME/.ssh/conf.d/**/id_ed25519
+  fi
+  if find "$HOME/.ssh/conf.d/" -name "*.cer" -print -quit; then
+    /usr/bin/keychain -q --nogui $HOME/.ssh/conf.d/**/*.cer
+  fi
+  if find "$HOME/.ssh/conf.d/" -name "*.pem" -print -quit; then
+    /usr/bin/keychain -q --nogui $HOME/.ssh/conf.d/**/*.pem
+  fi
+
   source $HOME/.keychain/$(hostname)-sh
 
   # ポートフォワード
   if [ -e $HOME/.ssh/conf.d/port_forward.sh ]; then
-    nohup bash $HOME/.ssh/conf.d/port_forward.sh >/dev/null 2>&1 &!
+    nohup bash $HOME/.ssh/conf.d/port_forward.sh >/dev/null 2>&1
   else
     echo "「$HOME/.ssh/conf.d/port_forward.sh」は存在しませんでした"
   fi
 fi
-
 
 # peco
 function peco-history-selection() {
