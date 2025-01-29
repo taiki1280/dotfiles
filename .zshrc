@@ -197,7 +197,7 @@ function chpwd() {
 }
 
 # クリップボード
-alias pbcopy='clip.exe'
+alias pbcopy='iconv -f UTF-8 -t UTF-16LE | clip.exe'
 alias pbpaste='powershell.exe -Command Get-Clipboard'
 
 # Docker daemon
@@ -214,6 +214,11 @@ fi
 
 # devcontainer でないときのみ実行
 if [ "${REMOTE_CONTAINERS}" != "true" ]; then
+  if [[ $(command -v keychain) ]]; then
+  else
+    sudo apt install -y keychain
+  fi
+
   # For Loading the SSH key
   if find "$HOME/.ssh/conf.d/" -name "id_ed25519" -print -quit; then
     /usr/bin/keychain -q --nogui $HOME/.ssh/conf.d/**/id_ed25519
