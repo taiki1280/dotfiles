@@ -86,6 +86,7 @@ plugins=(
   composer
   python
   cakephp3
+  terraform
   # 外部プラグイン
   zsh-autosuggestions
   zsh-syntax-highlighting
