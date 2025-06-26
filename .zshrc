@@ -221,17 +221,28 @@ if [ "${REMOTE_CONTAINERS}" != "true" ]; then
   fi
 
   # For Loading the SSH key
-  if find "$HOME/.ssh/conf.d/" -name "id_ed25519" -print -quit; then
-    /usr/bin/keychain -q --nogui $HOME/.ssh/conf.d/**/id_ed25519
-  fi
-  if find "$HOME/.ssh/conf.d/" -name "*.cer" -print -quit; then
-    /usr/bin/keychain -q --nogui $HOME/.ssh/conf.d/**/*.cer
-  fi
-  if find "$HOME/.ssh/conf.d/" -name "*.pem" -print -quit; then
-    /usr/bin/keychain -q --nogui $HOME/.ssh/conf.d/**/*.pem
-  fi
+  # keychainコマンドが存在する場合のみ実行
+  if command -v keychain >/dev/null 2>&1; then
+    # id_ed25519ファイルの処理
+    if find "$HOME/.ssh/conf.d/" -name "id_ed25519" -print -quit 2>/dev/null | grep -q .; then
+      /usr/bin/keychain -q --nogui $HOME/.ssh/conf.d/**/id_ed25519 2>/dev/null
+    fi
+    # .cerファイルの処理
+    if find "$HOME/.ssh/conf.d/" -name "*.cer" -print -quit 2>/dev/null | grep -q .; then
+      /usr/bin/keychain -q --nogui $HOME/.ssh/conf.d/**/*.cer 2>/dev/null
+    fi
+    # .pemファイルの処理
+    if find "$HOME/.ssh/conf.d/" -name "*.pem" -print -quit 2>/dev/null | grep -q .; then
+      /usr/bin/keychain -q --nogui $HOME/.ssh/conf.d/**/*.pem 2>/dev/null
+    fi
 
-  source $HOME/.keychain/$(hostname)-sh
+    # keychainファイルが存在する場合のみsource
+    if [ -e "$HOME/.keychain/$(hostname)-sh" ]; then
+      source $HOME/.keychain/$(hostname)-sh
+    fi
+  else
+    echo "keychainコマンドが見つかりません。SSHキーの自動読み込みは無効です。"
+  fi
 
   # ポートフォワード
   if [ -e $HOME/.ssh/conf.d/port_forward.sh ]; then
