@@ -102,7 +102,13 @@ source $ZSH/oh-my-zsh.sh
 # export LANG=en_US.UTF-8
 
 # Preferred editor for local and remote sessions
-export EDITOR='code --wait "$@"'
+if command -v cursor >/dev/null 2>&1; then
+  export EDITOR='cursor --wait "$@"'
+elif command -v code >/dev/null 2>&1; then
+  export EDITOR='code --wait "$@"'
+else
+  export EDITOR='vim'
+fi
 # if [[ -n $SSH_CONNECTION ]]; then
 #   export EDITOR='vim'
 # else
