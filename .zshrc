@@ -320,7 +320,27 @@ function git() {
 
   # git cloneの場合のみ特別処理
   if [[ "$1" == "clone" ]]; then
-    local url="$2"
+    # 引数を順番に処理してGitHubのURLを見つける
+    local url=""
+    local new_args=()
+    local found_url=0
+
+    for arg in "$@"; do
+      if [[ "$arg" =~ ^(git@github\.com:|https://github\.com/) && $found_url -eq 0 ]]; then
+        url="$arg"
+        found_url=1
+        # URLは後で処理するのでここでは追加しない
+      else
+        new_args+=("$arg")
+      fi
+    done
+
+    if [[ -z "$url" ]]; then
+      # GitHubのURLが見つからない場合はそのまま実行
+      command git "$@"
+      return
+    fi
+
     local modified_url=""
 
     # GitHubのSSH URLかどうかチェック
@@ -330,8 +350,7 @@ function git() {
         modified_url=$(echo "$url" | sed 's/git@github\.com:/git@github.com-personal:/')
         echo "📋 プライベート用GitHubアカウントでクローンします"
         echo "🔗 URL: $modified_url"
-        shift 2 # 最初の2つの引数（clone と url）を削除
-        command git clone "$modified_url" "$@"
+        command git "${new_args[@]}" "$modified_url"
       else
         # 会社用ディレクトリの場合はそのまま
         echo "🏢 会社用GitHubアカウントでクローンします"
@@ -349,8 +368,7 @@ function git() {
         fi
         echo "📋 プライベート用GitHubアカウント（SSH）でクローンします"
         echo "🔗 変換: $url → $modified_url"
-        shift 2 # 最初の2つの引数を削除
-        command git clone "$modified_url" "$@"
+        command git "${new_args[@]}" "$modified_url"
       else
         # 会社用ディレクトリの場合、SSH形式に変換
         if [[ "$url" =~ \.git$ ]]; then
@@ -360,8 +378,7 @@ function git() {
         fi
         echo "🏢 会社用GitHubアカウント（SSH）でクローンします"
         echo "🔗 変換: $url → $modified_url"
-        shift 2 # 最初の2つの引数を削除
-        command git clone "$modified_url" "$@"
+        command git "${new_args[@]}" "$modified_url"
       fi
     else
       # GitHub以外のURLはそのまま
