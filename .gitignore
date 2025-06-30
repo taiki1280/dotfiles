@@ -1,1 +1,42 @@
+# 個人設定ファイル
 .zsh_profile
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ログファイル
+*.log
+dotfiles-*.log
+
+# バックアップファイル
+*.bak
+*.backup
+*~
+
+# SSH キー（セキュリティ）
+*.pem
+*.key
+id_*
+!*.pub
+
+# 一時ファイル
+.tmp/
+*.tmp
+*.swp
+*.swo
+
+# IDE/エディタ
+.vscode/settings.json
+.idea/
+*.sublime-*
+
+# テスト用ファイル
+test/
+tests/
+*.test

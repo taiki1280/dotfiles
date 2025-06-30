@@ -1,52 +1,121 @@
-#!/usr/bin/zsh
-DOT_FILES=($(ls -d $(ls -aF | grep -v "/" | grep -v .gitignore | grep -e "^\..\+$")))
-echo '同階層にあるすべての dotfiles を処理します。'
-echo '\t''1. ホームディレクトリ直下に既に同じ名前のファイルがある場合、バックアップを作成して移動'
-echo '\t''2. ドットファイルの新保陸リンクを作成'
-echo '\t''3. .zshrc がある場合、読み込み'
-echo '-----------------------------------------------------------------------------------'
-BACKUP_DIR=$HOME/dotfiles_bk.d/
-message_result=''
+#!/usr/bin/env bash
+set -euo pipefail # エラー時即座に終了
 
-for file in ${DOT_FILES[@]}; do
-  message_result="${message_result}${file}"'\n'
-  if [ -f $HOME/$file ]; then
-    if [ ! -d $BACKUP_DIR ]; then
-      # バックアップのディレクトリが存在しない場合は作成
-      mkdir -v $BACKUP_DIR
-      message_result="${message_result}"'\t''created directory for backup''\n'
+# カラー出力用
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# ログ関数
+log() {
+  echo -e "${BLUE}[$(date '+%H:%M:%S')]${NC} $*"
+}
+
+success() {
+  echo -e "${GREEN}✅ $*${NC}"
+}
+
+warning() {
+  echo -e "${YELLOW}⚠️  $*${NC}"
+}
+
+error() {
+  echo -e "${RED}❌ $*${NC}"
+}
+log "🏠 Dotfiles セットアップを開始します"
+echo
+log "処理内容:"
+log "  1. ホームディレクトリに既存ファイルがある場合、バックアップを作成"
+log "  2. dotfiles のシンボリックリンクを作成"
+log "  3. 必要なツールのインストール"
+echo
+
+# dotfiles リスト取得（ファイルのみ、ディレクトリと特殊ファイルを除外）
+DOT_FILES=()
+for file in .*; do
+  # .と..を除外、ディレクトリを除外、.gitを除外
+  if [[ "$file" != "." && "$file" != ".." && ! -d "$file" && "$file" != ".git"* ]]; then
+    DOT_FILES+=("$file")
+  fi
+done
+BACKUP_DIR="$HOME/.dotfiles-backup"
+
+if [ ${#DOT_FILES[@]} -eq 0 ]; then
+  error "dotfiles が見つかりません"
+  exit 1
+fi
+
+log "処理対象ファイル: ${DOT_FILES[*]}"
+echo
+
+log "📂 シンボリックリンクを作成中..."
+
+for file in "${DOT_FILES[@]}"; do
+  log "処理中: $file"
+
+  target="$HOME/$file"
+  source="$PWD/$file"
+
+  # 既存ファイルのバックアップ
+  if [ -e "$target" ] && [ ! -L "$target" ]; then
+    if [ ! -d "$BACKUP_DIR" ]; then
+      mkdir -p "$BACKUP_DIR"
+      log "バックアップディレクトリを作成: $BACKUP_DIR"
     fi
-    message_result="${message_result}"'\t'"already exists「$HOME/$file」"'\n'
-    message_result="${message_result}"'\t''So, move it to backup directory & create a new one.''\n'
-    # 予め作成しているバックアップディレクトリへ移動させる
-    mv $HOME/$file $BACKUP_DIR$file
+
+    backup_name="$file.$(date +%Y%m%d_%H%M%S)"
+    mv "$target" "$BACKUP_DIR/$backup_name"
+    warning "既存ファイルをバックアップ: $backup_name"
   fi
-  result=$(ln -svf $PWD/$file $HOME/)
-  message_result="${message_result}"'\t'"created: ${result}"'\n'
+
+  # シンボリックリンク作成
+  if ln -sf "$source" "$target"; then
+    success "リンク作成: $file"
+  else
+    error "リンク作成失敗: $file"
+  fi
 done
 
-echo '【実行結果】'
-echo $message_result
-echo '-----------------------------------------------------------------------------------'
+echo
 
-echo 'oh-my-zsh が入っていない場合、インストール'
-if [ ! -d $HOME/.oh-my-zsh ]; then
-  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+log "🔧 必要なツールをインストール中..."
+
+# oh-my-zsh インストール
+if [ ! -d "$HOME/.oh-my-zsh" ]; then
+  log "oh-my-zsh をインストール中..."
+  if sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" --unattended; then
+    success "oh-my-zsh インストール完了"
+  else
+    error "oh-my-zsh インストール失敗"
+  fi
+else
+  log "oh-my-zsh は既にインストールされています"
 fi
-echo '-----------------------------------------------------------------------------------'
 
-echo 'oh-my-zsh plugin が入っていない場合、インストール'
-# plugin
+# プラグインインストール
+log "oh-my-zsh プラグインをインストール中..."
 PLUGIN_LIST=('zsh-autosuggestions' 'zsh-syntax-highlighting')
-for plugin in ${PLUGIN_LIST[@]}; do
-  if [ ! -d ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/$plugin ]; then
-    git clone https://github.com/zsh-users/$plugin ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/$plugin
+
+for plugin in "${PLUGIN_LIST[@]}"; do
+  plugin_dir="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/$plugin"
+
+  if [ ! -d "$plugin_dir" ]; then
+    log "プラグインをインストール中: $plugin"
+    if git clone "https://github.com/zsh-users/$plugin" "$plugin_dir"; then
+      success "プラグインインストール完了: $plugin"
+    else
+      error "プラグインインストール失敗: $plugin"
+    fi
+  else
+    log "プラグインは既にインストールされています: $plugin"
   fi
 done
-echo '-----------------------------------------------------------------------------------'
 
-echo '最後に .zshrc を読み込み'
-if [ -e $HOME/.zshrc ]; then
-  echo '-----------------------------------------------------------------------------------'
-  source $HOME/.zshrc
-fi
+echo
+success "🎉 dotfiles セットアップが完了しました！"
+echo
+log "ターミナルを再起動するか、以下のコマンドを実行してください:"
+echo "  source ~/.zshrc"
+echo
