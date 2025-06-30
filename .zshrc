@@ -297,3 +297,85 @@ function peco-history-selection() {
 
 zle -N peco-history-selection
 bindkey '^R' peco-history-selection
+
+# GitHub用ヘルパー関数
+function gclone() {
+  local repo_name="$1"
+  local current_dir=$(pwd)
+
+  if [[ "$current_dir" == *"/Users/taiki/github/taiki1280"* ]]; then
+    # プライベートディレクトリの場合
+    echo "📋 プライベート用でクローンしています: $repo_name"
+    command git clone git@github.com-personal:taiki1280/$repo_name.git
+  else
+    # 会社用ディレクトリの場合
+    echo "🏢 会社用でクローンしています: $repo_name"
+    command git clone git@github.com:$repo_name.git
+  fi
+}
+
+# git コマンドのラッパー関数
+function git() {
+  local current_dir=$(pwd)
+
+  # git cloneの場合のみ特別処理
+  if [[ "$1" == "clone" ]]; then
+    local url="$2"
+    local modified_url=""
+
+    # GitHubのSSH URLかどうかチェック
+    if [[ "$url" =~ ^git@github\.com: ]]; then
+      if [[ "$current_dir" == *"/Users/taiki/github/taiki1280"* ]]; then
+        # プライベートディレクトリの場合、github.com-personalに変更
+        modified_url=$(echo "$url" | sed 's/git@github\.com:/git@github.com-personal:/')
+        echo "📋 プライベート用GitHubアカウントでクローンします"
+        echo "🔗 URL: $modified_url"
+        shift 2 # 最初の2つの引数（clone と url）を削除
+        command git clone "$modified_url" "$@"
+      else
+        # 会社用ディレクトリの場合はそのまま
+        echo "🏢 会社用GitHubアカウントでクローンします"
+        echo "🔗 URL: $url"
+        command git "$@"
+      fi
+    # GitHubのHTTPS URLの場合
+    elif [[ "$url" =~ ^https://github\.com/ ]]; then
+      if [[ "$current_dir" == *"/Users/taiki/github/taiki1280"* ]]; then
+        # プライベートディレクトリの場合、SSH形式に変換してpersonalホストを使用
+        if [[ "$url" =~ \.git$ ]]; then
+          modified_url=$(echo "$url" | sed -E 's|https://github\.com/([^/]+)/([^/]+)\.git$|git@github.com-personal:\1/\2.git|')
+        else
+          modified_url=$(echo "$url" | sed -E 's|https://github\.com/([^/]+)/([^/]+)$|git@github.com-personal:\1/\2.git|')
+        fi
+        echo "📋 プライベート用GitHubアカウント（SSH）でクローンします"
+        echo "🔗 変換: $url → $modified_url"
+        shift 2 # 最初の2つの引数を削除
+        command git clone "$modified_url" "$@"
+      else
+        # 会社用ディレクトリの場合、SSH形式に変換
+        if [[ "$url" =~ \.git$ ]]; then
+          modified_url=$(echo "$url" | sed -E 's|https://github\.com/([^/]+)/([^/]+)\.git$|git@github.com:\1/\2.git|')
+        else
+          modified_url=$(echo "$url" | sed -E 's|https://github\.com/([^/]+)/([^/]+)$|git@github.com:\1/\2.git|')
+        fi
+        echo "🏢 会社用GitHubアカウント（SSH）でクローンします"
+        echo "🔗 変換: $url → $modified_url"
+        shift 2 # 最初の2つの引数を削除
+        command git clone "$modified_url" "$@"
+      fi
+    else
+      # GitHub以外のURLはそのまま
+      command git "$@"
+    fi
+  else
+    # clone以外のgitコマンドはそのまま実行
+    command git "$@"
+  fi
+}
+
+function git-check-config() {
+  echo "🔍 現在のGit設定:"
+  echo "  ユーザー名: $(git config user.name)"
+  echo "  メールアドレス: $(git config user.email)"
+  echo "  リモートURL: $(git remote get-url origin 2>/dev/null || echo 'リモートURLが設定されていません')"
+}
