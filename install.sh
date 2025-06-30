@@ -113,6 +113,20 @@ for plugin in "${PLUGIN_LIST[@]}"; do
   fi
 done
 
+# Lima Docker自動起動を設定（macOSのみ）
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  if command -v limactl >/dev/null 2>&1; then
+    log "Lima Docker自動起動を設定中..."
+    if limactl start-at-login default 2>/dev/null; then
+      success "Lima Docker自動起動を有効化しました"
+    else
+      warning "Lima Docker自動起動の設定に失敗しました（手動で実行してください: limactl start-at-login default）"
+    fi
+  else
+    warning "limaがインストールされていません"
+  fi
+fi
+
 echo
 success "🎉 dotfiles セットアップが完了しました！"
 echo

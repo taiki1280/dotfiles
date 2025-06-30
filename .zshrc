@@ -224,8 +224,12 @@ if [[ $(uname -r) =~ microsoft ]]; then
   alias pbpaste='powershell.exe -Command Get-Clipboard'
 fi
 
-# Docker daemon (WSL/Linux環境でのみ実行)
-if [[ $(uname -r) =~ microsoft ]] || [[ "$OSTYPE" == "linux-gnu"* ]]; then
+# Docker daemon
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  # macOS環境でのDocker CLI自動起動（lima使用）
+  # Lima Docker自動起動: limactl start-at-loginで設定済み
+elif [[ $(uname -r) =~ microsoft ]] || [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  # WSL/Linux環境でのDocker daemon自動起動
   if command -v systemctl >/dev/null 2>&1 && test "$(pgrep -o systemctl)" = "1" && test $(systemctl is-active docker) = 'inactive'; then
     sudo /usr/sbin/service docker start
     echo 'Dockerが起動していなかったため、起動しておきました。'
