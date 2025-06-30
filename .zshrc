@@ -72,7 +72,6 @@ HIST_STAMPS="yyyy-mm-dd"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
   # oh-my-zsh 初期プラグイン（元々入っているもの）
-  ubuntu
   docker
   docker-compose
   vscode
@@ -91,6 +90,15 @@ plugins=(
   zsh-autosuggestions
   zsh-syntax-highlighting
 )
+
+# OS別プラグイン追加
+if [[ $(uname -r) =~ microsoft ]] || [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  # WSL/Linux環境でのみubuntuプラグインを追加
+  plugins+=(ubuntu)
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+  # macOS環境で必要に応じて追加
+  plugins+=(macos)
+fi
 
 source $ZSH/oh-my-zsh.sh
 
@@ -150,11 +158,18 @@ function _ssh {
 }
 
 # enable color support of ls and also add handy aliases
-if [ -x /usr/bin/dircolors ]; then
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  # macOS
+  export CLICOLOR=1
+  export LSCOLORS=GxFxCxDxBxegedabagaced
+  alias ls='ls -G'
+  alias grep='grep --color=auto'
+  alias fgrep='fgrep --color=auto'
+  alias egrep='egrep --color=auto'
+elif [ -x /usr/bin/dircolors ]; then
+  # Linux/WSL
   test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
   alias ls='ls --color=auto'
-  # alias dir='dir --color=auto'
-  # alias vdir='vdir --color=auto'
   alias grep='grep --color=auto'
   alias fgrep='fgrep --color=auto'
   alias egrep='egrep --color=auto'
@@ -203,58 +218,73 @@ function chpwd() {
   ll
 }
 
-# クリップボード
-alias pbcopy='iconv -f UTF-8 -t UTF-16LE | clip.exe'
-alias pbpaste='powershell.exe -Command Get-Clipboard'
+# クリップボード (WSL環境でのみ有効)
+if [[ $(uname -r) =~ microsoft ]]; then
+  alias pbcopy='iconv -f UTF-8 -t UTF-16LE | clip.exe'
+  alias pbpaste='powershell.exe -Command Get-Clipboard'
+fi
 
-# Docker daemon
-if test "$(pgrep -o systemctl)" = "1" && test $(systemctl is-active docker) = 'inactive'; then
-  sudo /usr/sbin/service docker start
-  echo 'Dockerが起動していなかったため、起動しておきました。'
+# Docker daemon (WSL/Linux環境でのみ実行)
+if [[ $(uname -r) =~ microsoft ]] || [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  if command -v systemctl >/dev/null 2>&1 && test "$(pgrep -o systemctl)" = "1" && test $(systemctl is-active docker) = 'inactive'; then
+    sudo /usr/sbin/service docker start
+    echo 'Dockerが起動していなかったため、起動しておきました。'
+  fi
 fi
 
 if [ -e $HOME/.zsh_profile ]; then
   source $HOME/.zsh_profile
-else
-  echo "「$HOME/.zsh_profile」は存在しませんでした"
 fi
 
 # devcontainer でないときのみ実行
 if [ "${REMOTE_CONTAINERS}" != "true" ]; then
-  if [[ $(command -v keychain) ]]; then
-  else
-    sudo apt install -y keychain
+  # keychainが存在しない場合、OSに応じてインストール
+  if ! command -v keychain >/dev/null 2>&1; then
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+      # macOS の場合
+      if command -v brew >/dev/null 2>&1; then
+        brew install keychain
+      else
+        echo "Homebrewがインストールされていません。keychainを手動でインストールしてください。"
+      fi
+    elif [[ $(uname -r) =~ microsoft ]] || [[ "$OSTYPE" == "linux-gnu"* ]]; then
+      # WSL/Linux の場合
+      sudo apt install -y keychain
+    fi
   fi
 
   # For Loading the SSH key
   # keychainコマンドが存在する場合のみ実行
   if command -v keychain >/dev/null 2>&1; then
+    # keychainのパスを取得
+    KEYCHAIN_PATH=$(command -v keychain)
+
     # id_ed25519ファイルの処理
     if find "$HOME/.ssh/conf.d/" -name "id_ed25519" -print -quit 2>/dev/null | grep -q .; then
-      /usr/bin/keychain -q --nogui $HOME/.ssh/conf.d/**/id_ed25519 2>/dev/null
+      $KEYCHAIN_PATH -q --nogui $HOME/.ssh/conf.d/**/id_ed25519 2>/dev/null
     fi
     # .cerファイルの処理
     if find "$HOME/.ssh/conf.d/" -name "*.cer" -print -quit 2>/dev/null | grep -q .; then
-      /usr/bin/keychain -q --nogui $HOME/.ssh/conf.d/**/*.cer 2>/dev/null
+      $KEYCHAIN_PATH -q --nogui $HOME/.ssh/conf.d/**/*.cer 2>/dev/null
     fi
     # .pemファイルの処理
     if find "$HOME/.ssh/conf.d/" -name "*.pem" -print -quit 2>/dev/null | grep -q .; then
-      /usr/bin/keychain -q --nogui $HOME/.ssh/conf.d/**/*.pem 2>/dev/null
+      $KEYCHAIN_PATH -q --nogui $HOME/.ssh/conf.d/**/*.pem 2>/dev/null
     fi
 
     # keychainファイルが存在する場合のみsource
     if [ -e "$HOME/.keychain/$(hostname)-sh" ]; then
       source $HOME/.keychain/$(hostname)-sh
     fi
-  else
-    echo "keychainコマンドが見つかりません。SSHキーの自動読み込みは無効です。"
   fi
 
-  # ポートフォワード
-  if [ -e $HOME/.ssh/conf.d/port_forward.sh ]; then
-    nohup bash $HOME/.ssh/conf.d/port_forward.sh >/dev/null 2>&1
-  else
-    echo "「$HOME/.ssh/conf.d/port_forward.sh」は存在しませんでした"
+  # ポートフォワード (WSL環境でのみ実行)
+  if [[ $(uname -r) =~ microsoft ]]; then
+    if [ -e $HOME/.ssh/conf.d/port_forward.sh ]; then
+      nohup bash $HOME/.ssh/conf.d/port_forward.sh >/dev/null 2>&1
+    else
+      echo "「$HOME/.ssh/conf.d/port_forward.sh」は存在しませんでした"
+    fi
   fi
 fi
 
